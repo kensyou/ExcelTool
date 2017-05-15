@@ -45,7 +45,7 @@ namespace ExcelTool.Modules
                 var folder = new FolderBrowserDialog()
                 {
                     RootFolder = Environment.SpecialFolder.Desktop,
-                    SelectedPath = @"D:\dev\apac\grid_jp_id\GRID.Schema.root\GRID_Upload.Schema\Utility\JpTransportInterchangeConverter\POI",
+                    SelectedPath = @"N:\JP-TYO-IT_ProductandSolutions\Projects\GRID_ID\MasterData\1606DB\POI",
                     Description = "IC Source Folderを選択してください"
                 };
                 if (folder.ShowDialog() == DialogResult.OK)

@@ -48,13 +48,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\HighwayInterchange.cs" />
+    <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="ZenrinParser.cs" />
     <Compile Include="Models\Highway.cs" />
     <Compile Include="Models\Interchange.cs" />
     <Compile Include="Models\InterchangeParsed.cs" />
     <Compile Include="Models\InterchangeRaw.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlServerTypes\Loader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="SqlServerTypes\readme.htm" />
@@ -70,9 +73,6 @@
     <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
