@@ -1,4 +1,9 @@
-﻿using ExcelTool.UI.ViewModel;
+﻿using BruTile.Predefined;
+using ExcelTool.UI.ViewModel;
+using Mapsui;
+using Mapsui.Layers;
+using Mapsui.Projection;
+using Mapsui.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +26,23 @@ namespace ExcelTool.UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        readonly MainWindowViewModel _Model;
         public MainWindow(MainWindowViewModel model)
         {
             InitializeComponent();
             DataContext = model;
+            _Model = model;
+            MyMapControl.RenderMode = Mapsui.UI.Wpf.RenderMode.Wpf;
+            MyMapControl.Map = model.Map;
+            HighwayList.SelectionChanged += ReloadMap;
+            StyleList.SelectionChanged += ReloadMap;
+        }
+
+        private void ReloadMap(object sender, SelectionChangedEventArgs e)
+        {
+            MyMapControl.Map.Layers.Clear();
+            MyMapControl.Map = _Model.Map;
+            MyMapControl.Refresh();
         }
     }
 }

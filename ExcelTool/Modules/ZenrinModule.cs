@@ -11,6 +11,16 @@ using System.Windows.Forms;
 using ExcelTool.ZenrinIC;
 using ExcelTool.ZenrinIC.Models;
 using NetOffice.ExcelApi.Enums;
+using Mapsui.Layers;
+using Mapsui.Styles;
+using Mapsui.Providers;
+using Mapsui.Geometries;
+using Mapsui;
+using Mapsui.Utilities;
+using Mapsui.Projection;
+using BruTile.Predefined;
+using BruTile.Web;
+using ExcelTool.UI.Model;
 
 namespace ExcelTool.Modules
 {
@@ -61,7 +71,7 @@ namespace ExcelTool.Modules
             //titleCell.Style = _Style.GetMasterTableHeaderStyle(worksheet);
             titleCell.EntireColumn.ColumnWidth = 1.0;
 
-            var header = new List<object> { "PrefectureCode", "TempInterchangeId", "IC_Kana", "IC_Kanji",  "Highway", "Latitude", "Longitude", "Data_Date" };
+            var header = new List<object> { "PrefectureCode", "TempInterchangeId", "IC_Kana", "IC_Kanji", "Highway", "Latitude", "Longitude", "Data_Date" };
             var data = new List<List<object>> { header }.Concat(interchanges.Select(r =>
                 new List<object> { r.PrefectureCode, r.TempInterchangeId, r.IC_Kana, r.IC_Kanji, r.HighwayDisplay, r.Latitude, r.Longitude
                 , DateTime.SpecifyKind(r.DataDate, DateTimeKind.Utc).ToLocalTime()})).ToArray().CreateRectangularArray();
@@ -92,7 +102,7 @@ namespace ExcelTool.Modules
             //titleCell.Style = _Style.GetMasterTableHeaderStyle(worksheet);
             titleCell.EntireColumn.ColumnWidth = 1.0;
 
-            var header = new List<object> { "HighwayId", "HighwayKanji", "HighwayKana", "InterchangeCount", "Interchanges"};
+            var header = new List<object> { "HighwayId", "HighwayKanji", "HighwayKana", "InterchangeCount", "Interchanges" };
             var data = new List<List<object>> { header }.Concat(highways.Select(r =>
                 new List<object> { r.TempHighwayId, r.HighwayKanji, r.HighwayKana, r.InterchangeCount, String.Join(", ", r.Interchanges.Select(s=>s.IC_Kanji))
                 })).ToArray().CreateRectangularArray();
@@ -121,9 +131,9 @@ namespace ExcelTool.Modules
             //titleCell.Style = _Style.GetMasterTableHeaderStyle(worksheet);
             titleCell.EntireColumn.ColumnWidth = 1.0;
 
-            var header = new List<object> { "HighwayId", "Highway", "Interchange", "SortOrder", "Latitude", "Longitude"};
+            var header = new List<object> { "HighwayId", "Highway", "Interchange", "SortOrder", "Latitude", "Longitude" };
             var data = new List<List<object>> { header }.Concat(highwayInterchanges.Select(r =>
-                new List<object> { r.TempHighwayId, r.HighwayKanji, r.Interchange.IC_Kanji, r.Interchange.SortOrder, r.Interchange.Latitude, r.Interchange.Longitude
+                new List<object> { r.TempHighwayId, r.HighwayKanji, r.Interchange.IC_Kanji, r.SortOrder, r.Interchange.Latitude, r.Interchange.Longitude
                 })).ToArray().CreateRectangularArray();
             var tableTopLeft = worksheet.Cells[tableRowOffset + 1, tableColOffset + 1];
             var tableBottomRight = worksheet.Cells[highwayInterchanges.Count() + tableRowOffset + 1, header.Count() + tableColOffset];
@@ -140,6 +150,108 @@ namespace ExcelTool.Modules
             opList.Range.Columns.AutoFit();
             opList.Range.Rows.AutoFit();
             return worksheet;
+        }
+        public IEnumerable<Highway> Highways
+        {
+            get
+            {
+                return _ZenrinParser.Highways;
+            }
+        }
+        private Highway SelectedHighway { get; set; }
+        private MapStyle SelectedMapStyle { get; set; }
+        public Func<Highway, MapStyle, Map> MapGenerator
+        {
+            get
+            {
+                return (Highway highway, MapStyle mapStyle) =>
+                {
+                    //TODO
+                    if (highway != null) this.SelectedHighway = highway;
+                    if (mapStyle != null) this.SelectedMapStyle = mapStyle;
+
+                    var result = _ZenrinParser.HighwayInterchanges.Where(s => s.TempHighwayId == this.SelectedHighway.TempHighwayId).OrderBy(s => s.SortOrder).Select(ic =>
+                  {
+                      var label = ic.Interchange.IC_Kanji;
+                      var center = new Point(ic.Interchange.Longitude, ic.Interchange.Latitude);
+                      // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
+                      var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(center.X, center.Y);
+                      return Tuple.Create(label, sphericalMercatorCoordinate);
+                  }).ToArray();
+
+
+
+                    var map = new Map();
+                    map.Layers.Add(Mapbox.CreateTileLayer(this.SelectedMapStyle));
+                    // Set the center of the viewport to the coordinate. The UI will refresh automatically
+                    //map.Viewport.Center = result[0].Item2;
+                    // Additionally you might want to set the resolution, this could depend on your specific purpose
+                    //map.Viewport.Resolution = 14;
+                    var bb = new BoundingBox(result.Select(s => s.Item2).ToList());
+                    //map.NavigateTo(bb, ScaleMethod.Fit);
+                    ZoomHelper.ZoomToBoudingbox(map.Viewport, bb.Left, bb.Top, bb.Right, bb.Bottom, 640, 480, ScaleMethod.Fit);
+                    //map.Viewport.Center = bb.GetCentroid();
+                    //map.Viewport.Resolution = 13;
+                    map.Layers.Add(HighwayMap.CreateLineStringLayer(result.Select(s => s.Item2), HighwayMap.CreateLineStringStyle()));
+                    map.Layers.Add(HighwayMap.CreateHighwayICLayer(result));
+
+                    return map;
+                };
+            }
+        }
+        public static class Mapbox
+        {
+            private static readonly BruTile.Attribution MapboxAttribution = new BruTile.Attribution(
+                "© Mapbox", "http://www.mapbox.org/copyright");
+
+            public static TileLayer CreateTileLayer(MapStyle mapStyle)
+            {
+                var mapId = mapStyle == null ? "mapbox.streets" : mapStyle.Name;
+                var url = $"https://api.mapbox.com/v4/{mapId}/{{z}}/{{x}}/{{y}}@2x.png?access_token=pk.eyJ1Ijoia2Vuc3lvdSIsImEiOiJjajJvZjR3cDEwMmZ2MzNxYmNpMnZrc3FmIn0.h_3HKpIB-jFdH0Efi-rgkw";
+                return new TileLayer(new HttpTileSource(new GlobalSphericalMercator(0, 18), url ,
+                            new[] { "a", "b", "c" }, name: "Mapbox",
+                            attribution: MapboxAttribution));
+            }
+        }
+        public static class HighwayMap
+        {
+            public static ILayer CreateHighwayICLayer(Tuple<string, Point>[] pts)
+            {
+                var memoryProvider = new MemoryProvider();
+                foreach (var pt in pts)
+                {
+                    var featureWithDefaultStyle = new Feature { Geometry = pt.Item2 };
+                    featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = pt.Item1 });
+                    memoryProvider.Features.Add(featureWithDefaultStyle);
+                }
+                return new MemoryLayer { Name = "高速IC", DataSource = memoryProvider };
+            }
+
+
+            public static ILayer CreateLineStringLayer(IEnumerable<Point> pts, IStyle style = null)
+            {
+                return new MemoryLayer
+                {
+                    DataSource = new MemoryProvider(new Feature
+                    {
+                        Styles = new List<IStyle> { style },
+                        Geometry = new LineString(pts)
+                    }
+                    ),
+                    Name = "LineStringLayer",
+                    Style = style
+                };
+            }
+
+            public static IStyle CreateLineStringStyle()
+            {
+                return new VectorStyle
+                {
+                    Fill = null,
+                    Outline = null,
+                    Line = { Color = Color.Red, Width = 4 }
+                };
+            }
         }
 
     }

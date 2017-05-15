@@ -3,10 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xaml="clr-namespace:Mapsui.UI.Wpf;assembly=Mapsui.UI.Wpf"
         mc:Ignorable="d"
-        Title="Add-in X WPF Sample"
-        Height="450" Width="600">
-    <Grid>
-        <TextBlock>Hello world</TextBlock>
+        Title="Openstreet Map"
+        Height="480" Width="640" Topmost="True">
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <!--<TextBlock Text="{Binding Greeting}"></TextBlock>-->
+        <xaml:MapControl Name="MyMapControl" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ></xaml:MapControl>
+        <Border BorderBrush="White" Opacity="0.65" Background="White" BorderThickness="6" MinWidth="140"
+                    MinHeight="30"
+                    VerticalAlignment="Top" HorizontalAlignment="Left">
+            <StackPanel>
+                <ComboBox Name="StyleList" Margin="0,0, 0, 10" ItemsSource="{Binding MapStyles}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedMapStyle}"></ComboBox>
+                <ComboBox Name="HighwayList" Margin="0,0, 0, 10" ItemsSource="{Binding Highways}" DisplayMemberPath="HighwayKanji" SelectedItem="{Binding SelectedHighway}"></ComboBox>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

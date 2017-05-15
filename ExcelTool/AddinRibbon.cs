@@ -26,8 +26,8 @@ namespace ExcelTool
                             d.AddButton("Import IC")
                             .SetId("btnImportIC")
                             .LargeSize().ImageMso("Repeat");
-                            d.AddButton("Test WPF")
-                            .SetId("btnTestWpf")
+                            d.AddButton("Map")
+                            .SetId("btnMap")
                             .LargeSize().ImageMso("Repeat");
                         });
                     });
@@ -40,7 +40,7 @@ namespace ExcelTool
             cmds.AddButtonCommand("btnImportIC")
                 .IsEnabled(() => AddinContext.ExcelApp.Worksheets.Count() > 2)
                 .Action(() => AddinContext.MainController.ImportInterchangeData().Wait());
-            cmds.AddButtonCommand("btnTestWpf")
+            cmds.AddButtonCommand("btnMap")
                 .IsEnabled(() => AddinContext.ExcelApp.Worksheets.Any()).IsVisible(() => true)
                 .Action(() => AddinContext.MainController.Sample.OpenForm());
             
@@ -65,7 +65,7 @@ namespace ExcelTool
         public override void OnOpening()
         {
             // Register to events
-            AddinContext.ExcelApp.SheetSelectionChangeEvent += (a, e) => RefreshRibbon();
+            //AddinContext.ExcelApp.SheetSelectionChangeEvent += (a, e) => RefreshRibbon();
             AddinContext.ExcelApp.SheetActivateEvent += (e) => RefreshRibbon();
             AddinContext.ExcelApp.SheetChangeEvent += (a, e) => RefreshRibbon();
         }

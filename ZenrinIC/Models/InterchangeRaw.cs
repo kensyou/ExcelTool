@@ -35,8 +35,10 @@ namespace ExcelTool.ZenrinIC.Models
                 r.IC_Kana = this.IC_Kana;
                 r.HighwayKanji = this.HighwayKanji;
                 r.IC_Kanji = this.IC_Kanji;
-                r.Latitude = ConvertDegreeAngleToDouble(this.Latitude);
-                r.Longitude = ConvertDegreeAngleToDouble(this.Longitude);
+                var lat_t = ConvertDegreeAngleToDouble(this.Latitude);
+                var lon_t = ConvertDegreeAngleToDouble(this.Longitude);
+                r.Latitude = ConvertJapToWgs84Lat(lat_t, lon_t);
+                r.Longitude = ConvertJapToWgs84Long(lat_t, lon_t);
                 r.DataDate = DateTime.ParseExact(this.DataDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.AssumeLocal);
                 return r;
             }
@@ -45,7 +47,14 @@ namespace ExcelTool.ZenrinIC.Models
                 throw new Exception($"FileName: {FileName}, Row: {RowNumber}, Exception: {ex.Message}");
             }
         }
-
+        private static double ConvertJapToWgs84Lat(double lat_t, double lon_t)
+        {
+            return lat_t - lat_t * 0.00010695 + lon_t * 0.000017464 + 0.0046017;
+        }
+        private static double ConvertJapToWgs84Long(double lat_t, double lon_t)
+        {
+            return lon_t - lat_t * 0.000046038 - lon_t * 0.000083043 + 0.010040;
+        }
         public static double ConvertDegreeAngleToDouble(string degressMinutesSeconds)
         {
             var d = degressMinutesSeconds.Split(':').Select(s => Double.Parse(s)).ToArray();

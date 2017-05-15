@@ -24,7 +24,7 @@ namespace ExcelTool.Startup
             var bootstrapper = (Bootstrapper)bootstrap;
 
             bootstrapper?.Builder.RegisterType<MainWindow>();
-            bootstrapper?.Builder.RegisterType<MainWindowViewModel>();
+            bootstrapper?.Builder.RegisterType<MainWindowViewModel>().SingleInstance();
             
         }
     }

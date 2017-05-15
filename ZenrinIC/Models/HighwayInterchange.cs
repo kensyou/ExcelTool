@@ -13,7 +13,8 @@ namespace ExcelTool.ZenrinIC.Models
         public int PrefectureCode { get; set; }
         public string HighwayKana { get; set; }
         public string HighwayKanji { get; set; }
-        public InterchangeParsed Interchange { get; set; }
+        public int SortOrder { get; set; }
+        public Interchange Interchange { get; set; }
         public override string ToString()
         {
             return HighwayKanji + " - " + Interchange.IC_Kanji;

@@ -156,6 +156,7 @@
       <HintPath>..\packages\NetOffice.Core.1.7.3.0\lib\net45\VBIDEApi.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddinContext.cs" />

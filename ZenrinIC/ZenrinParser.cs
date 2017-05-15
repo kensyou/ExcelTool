@@ -58,7 +58,8 @@ namespace ExcelTool.ZenrinIC
             }
             Highways = Highway.ParseHighways(data);
             Interchanges = Interchange.NormalizedInterchange(Highways);
-            HighwayInterchanges = Highways.SelectMany(h => h.Interchanges.OrderBy(i=>i.SortOrder).Select(i => new HighwayInterchange { Interchange = i, HighwayKana = h.HighwayKana, PrefectureCode = h.PrefectureCode, HighwayKanji = h.HighwayKanji, TempHighwayId = h.TempHighwayId })).ToList();
+            HighwayInterchanges = Interchanges.SelectMany(ic=>ic.Highways.Select(h=> new { Highway = h.Item1, SortOrder = h.Item2, Interchange = ic })).OrderBy(hi=>hi.Highway.TempHighwayId).ThenBy(hi=>hi.SortOrder)
+                .Select(i => new HighwayInterchange { Interchange = i.Interchange, SortOrder = i.SortOrder, HighwayKana = i.Highway.HighwayKana, PrefectureCode = i.Highway.PrefectureCode, HighwayKanji = i.Highway.HighwayKanji, TempHighwayId = i.Highway.TempHighwayId }).ToList();
             return this;
         }
     }
