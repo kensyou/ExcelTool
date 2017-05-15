@@ -29,6 +29,9 @@ namespace ExcelTool
                             d.AddButton("Map")
                             .SetId("btnMap")
                             .LargeSize().ImageMso("Repeat");
+                            d.AddButton("Export SQL")
+                            .SetId("btnZenrinICExportSql")
+                            .LargeSize().ImageMso("Export");
                         });
                     });
             });
@@ -43,7 +46,10 @@ namespace ExcelTool
             cmds.AddButtonCommand("btnMap")
                 .IsEnabled(() => AddinContext.ExcelApp.Worksheets.Any()).IsVisible(() => true)
                 .Action(() => AddinContext.MainController.Sample.OpenForm());
-            
+            cmds.AddButtonCommand("btnZenrinICExportSql")
+                .IsEnabled(() => AddinContext.ExcelApp.Worksheets.Any()).IsVisible(() => true)
+                .Action(() => AddinContext.MainController.ExportInterchangeAsMergeSql().Wait());
+
             //cmds.AddButtonCommand("TestCmd")
             //    .Action(() => AddinContext.MainController.Sample.ShowMessage());
 

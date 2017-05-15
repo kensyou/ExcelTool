@@ -18,5 +18,6 @@ namespace ExcelTool.Modules
 
         IEnumerable<Highway> Highways { get; }
         Task ImportInterchangeData();
+        Task ExportInterchangeDataAsMergeSql();
     }
 }

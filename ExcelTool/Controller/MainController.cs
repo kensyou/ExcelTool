@@ -3,8 +3,10 @@ using ExcelTool.Forms;
 using ExcelTool.Helper;
 using ExcelTool.Modules;
 using ExcelTool.Properties;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,8 +58,8 @@ namespace ExcelTool.Controller
                 {
                     var msgBox = new MessageBoxWithScroll(msg, caption, "Error: Please check detail below:", true);
                     msgBox.ShowDialog();
-                        //MessageBox.Show(msg, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    //MessageBox.Show(msg, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 else
                 {
                     MessageBox.Show(msg, caption);
@@ -68,5 +70,12 @@ namespace ExcelTool.Controller
         {
             await ExecuteAndCatch(_ZenrinModule.ImportInterchangeData);
         }
+
+        public async Task ExportInterchangeAsMergeSql()
+        {
+            await ExecuteAndCatch(_ZenrinModule.ExportInterchangeDataAsMergeSql);
+        }
+
+
     }
 }
