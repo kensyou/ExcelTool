@@ -32,7 +32,7 @@ namespace ExcelTool.ZenrinIC.Models
 
                 foreach (var i in sortedInterchanges)
                 {
-                    var existingIC = acc.FirstOrDefault(s => s.PrefectureCode == item.PrefectureCode && s.IC_Kanji == i.IC_Kanji);
+                    var existingIC = acc.FirstOrDefault(s => s.PrefectureCode == i.PrefectureCode && s.IC_Kanji == i.IC_Kanji);
 
                     if (existingIC == null)
                     {

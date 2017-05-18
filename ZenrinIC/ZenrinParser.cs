@@ -264,19 +264,13 @@ USING (
 	) kk ON sod.TransportInterchangeUID = kk.TransportInterchangeUID 
 		) tempIC 
 	INNER JOIN #StateLookup sl ON tempIC.StateTempID = sl.Id
-	LEFT JOIN (
-		SELECT sod.TransportInterchangeID, sod.TransportInterchange_EN, sod.Location FROM dbo.MAP_TransportInterchange AS sod  
-		INNER JOIN (
-			SELECT ti.TransportInterchangeID FROM dbo.MAP_TransportInterchange ti
-			INNER JOIN dbo.MAP_TransportInterchangeHighwayLNK lnk ON ti.TransportInterchangeID = lnk.TransportInterchangeID
-			INNER JOIN dbo.MAP_Highway r ON r.HighwayID = lnk.HighwayID
-		) k ON sod.TransportInterchangeID = k.TransportInterchangeID
-	) actualID ON tempIC.TransportInterchange_EN = actualID.TransportInterchange_EN
+	LEFT JOIN dbo.MAP_TransportInterchange actualID ON sl.StateID = actualID.StateID AND tempIC.TransportInterchange_EN = actualID.TransportInterchange_EN
 ) AS source (StateID, TransportInterchangeUID,TransportInterchangeID,TransportInterchange_EN, Location)
 ON (target.TransportInterchangeID = source.TransportInterchangeID)
 WHEN MATCHED
 	THEN UPDATE SET target.Location = source.Location,
 					target.StateID = source.StateID,
+					target.TransportInterchangeUID = source.TransportInterchangeUID,
 					target.Modified = GETDATE(),
 					target.ModifiedBy = 'Bulk Update'
 WHEN NOT MATCHED
@@ -328,7 +322,6 @@ ENABLE TRIGGER [dbo].[MAP_Highway_ML_Audit_TRG] ON [dbo].MAP_Highway_ML
 GO
 ENABLE TRIGGER [dbo].[MAP_Highway_Audit_TRG] ON [dbo].[MAP_Highway]
 GO
-
 ");
             return sb.ToString();
         }
