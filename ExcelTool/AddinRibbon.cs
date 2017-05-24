@@ -33,6 +33,12 @@ namespace ExcelTool
                             .SetId("btnZenrinICExportSql")
                             .LargeSize().ImageMso("Export");
                         });
+                        g.AddGroup("Industrial").SetId("IndustrialGroup").Items(d =>
+                        {
+                            d.AddButton("Parse Stacking")
+                            .SetId("btnParseIndustrialStackingList")
+                            .LargeSize().ImageMso("ResolveConflictOrError");
+                        });
                     });
             });
 
@@ -49,7 +55,9 @@ namespace ExcelTool
             cmds.AddButtonCommand("btnZenrinICExportSql")
                 .IsEnabled(() => AddinContext.ExcelApp.Worksheets.Any()).IsVisible(() => true)
                 .Action(() => AddinContext.MainController.ExportInterchangeAsMergeSql().Wait());
-
+            cmds.AddButtonCommand("btnParseIndustrialStackingList")
+                .IsEnabled(() => AddinContext.ExcelApp.Worksheets.Any()).IsVisible(() => true)
+                .Action(() => AddinContext.MainController.ParseIndustrialStackingList().Wait());
             //cmds.AddButtonCommand("TestCmd")
             //    .Action(() => AddinContext.MainController.Sample.ShowMessage());
 

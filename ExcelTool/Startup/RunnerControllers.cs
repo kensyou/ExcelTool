@@ -24,6 +24,7 @@ namespace ExcelTool.Startup
 
             bootstrapper?.Builder.RegisterType<ExcelHelper>().As<IExcelHelper>().SingleInstance();
             bootstrapper?.Builder.RegisterType<ZenrinModule>().As<IZenrinModule>().SingleInstance();
+            bootstrapper?.Builder.RegisterType<IndustrialModule>().As<IIndustrialModule>().SingleInstance();
         }
     }
 }

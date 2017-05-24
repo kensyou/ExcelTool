@@ -18,15 +18,18 @@ namespace ExcelTool.Controller
     {
         private readonly IExcelHelper _Helper;
         private readonly IZenrinModule _ZenrinModule;
+        private readonly IIndustrialModule _IndustrialModule;
         public MainController(SampleController sample
             , WpfInteractionController wpfInteraction
             , IExcelHelper helper
-            , IZenrinModule zenrin)
+            , IZenrinModule zenrin
+            , IIndustrialModule industrial)
         {
             Sample = sample;
             WpfInteraction = wpfInteraction;
             _Helper = helper;
             _ZenrinModule = zenrin;
+            _IndustrialModule = industrial;
         }
 
         public SampleController Sample { get; private set; }
@@ -76,6 +79,9 @@ namespace ExcelTool.Controller
             await ExecuteAndCatch(_ZenrinModule.ExportInterchangeDataAsMergeSql);
         }
 
-
+        public async Task ParseIndustrialStackingList()
+        {
+            await ExecuteAndCatch(_IndustrialModule.ParseIndustrialStackingList);
+        }
     }
 }

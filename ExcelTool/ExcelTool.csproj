@@ -167,6 +167,8 @@
     <Compile Include="Controller\MainController.cs" />
     <Compile Include="Helper\LinqExtensions.cs" />
     <Compile Include="Manipulation\ExcelInteraction.cs" />
+    <Compile Include="Modules\IIndustrialModule.cs" />
+    <Compile Include="Modules\IndustrialModule.cs" />
     <Compile Include="Modules\IZenrinModule.cs" />
     <Compile Include="Modules\ZenrinModule.cs" />
     <Compile Include="Helper\ExcelHelper.cs" />
